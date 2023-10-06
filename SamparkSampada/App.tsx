@@ -19,7 +19,7 @@ function App(): JSX.Element {
         backgroundColor: isDarkMode ? 'black' : 'white',
         padding: 10,
         alignContent: 'center',
-        justifyContent: 'center'
+        justifyContent: 'center',
       }}>
       <StatusBar
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "663564717207",
+    "firebase_url": "https://sampark-sampada-default-rtdb.firebaseio.com",
+    "project_id": "sampark-sampada",
+    "storage_bucket": "sampark-sampada.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:663564717207:android:6c50d175400ca3522d2dd2",
+        "android_client_info": {
+          "package_name": "com.samparksampada"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "663564717207-n9g8phef4eoe4tnuadn8rr990cf33i4j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCumAw_C_7FAmLzY9hAsn5jhGCbn93gRBY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "663564717207-n9g8phef4eoe4tnuadn8rr990cf33i4j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
