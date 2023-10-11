@@ -14,10 +14,12 @@ import {
   StyleSheet,
   ActivityIndicator,
   useColorScheme,
+  ScrollView
 } from 'react-native';
 import {OtpInput} from 'react-native-otp-entry';
 import auth from '@react-native-firebase/auth';
 import PhoneInput from 'react-native-phone-number-input';
+import MarketValidationForm from './MarketValidationForm';
 
 function Login(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -29,6 +31,7 @@ function Login(): JSX.Element {
   const [countdown, setCountdown] = useState(30);
 
   const [confirm, setConfirm] = useState(null);
+  const [isWaitForConfirm, setIsWaitForConfirm] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [userData, setUserData] = useState(null);
 
@@ -74,13 +77,11 @@ function Login(): JSX.Element {
         setLoggedInUser(user);
         console.log('DDD', mergeObjects(user.providerData));
 
-        setUserData(mergeObjects(user.providerData));
+        setUserData(mergeObjects(auth().currentUser?.providerData));
       } else {
         setLoggedInUser(null);
       }
     });
-    console.log(JSON.stringify(auth().currentUser?.providerData, undefined, 2));
-
     setPhone('');
     setOTP('');
     return () => {
@@ -99,7 +100,6 @@ function Login(): JSX.Element {
       clearInterval(countdownTimer);
       setLoading(false);
     }
-
     return () => {
       clearInterval(countdownTimer);
     };
@@ -109,7 +109,6 @@ function Login(): JSX.Element {
     setIsReady(false);
     setLoading(true);
     setCountdown(30);
-
     try {
       const confirmation = await auth().signInWithPhoneNumber(`+91${phone}`);
       setConfirm(confirmation);
@@ -122,13 +121,24 @@ function Login(): JSX.Element {
   };
 
   const confirmCode = async () => {
+    setIsWaitForConfirm(true);
     try {
       const isConfirm = await confirm.confirm(otp);
       console.log('OTP confirmed', isConfirm);
       setIsReady(false);
+      if (
+        !auth().currentUser?.providerId?.includes('google.com') ||
+        auth().currentUser?.providerId === 'phone'
+      ) {
+        onGoogleLinkButtonPress();
+        setInterval(() => {
+          setUserData(mergeObjects(auth().currentUser?.providerData));
+        }, 1000);
+      }
     } catch (error) {
       console.error('Error confirming OTP:', error);
     }
+    setIsWaitForConfirm(false);
   };
 
   const handleSignOut = async () => {
@@ -152,23 +162,11 @@ function Login(): JSX.Element {
       ]}>
       {loggedInUser ? (
         <>
-          {!(
-            userData?.providerId.includes('google.com') || isDisbaleLinkBtn
-          ) && (
-            <Button
-              disabled={isDisbaleLinkBtn}
-              title="Link Google"
-              onPress={() => {
-                setIsDisbaleLinkBtn(true);
-                onGoogleLinkButtonPress();
-              }}
-            />
-          )}
-          {userData?.providerId.includes('google.com') && (
+          {userData && userData.providerId.includes('google.com') && (
             <>
               <Image
-                source={{ uri: userData?.photoURL }}
-                style={{ width: 75, aspectRatio: 1, borderRadius: 25 }}
+                source={{uri: userData.photoURL}}
+                style={{width: 75, aspectRatio: 1, borderRadius: 25}}
               />
               <View
                 style={{
@@ -177,18 +175,124 @@ function Login(): JSX.Element {
               {userData?.displayName && (
                 <Text>Hello, {userData?.displayName} !</Text>
               )}
-              {userData?.providerId && <Text>{userData?.providerId}</Text>}
+              {userData?.providerId && (
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                  }}>
+                  <Text>Linked with :</Text>
+                  <View
+                    style={{
+                      marginStart: 10,
+                      position: 'relative',
+                    }}>
+                    <View
+                      style={{
+                        backgroundColor: 'green',
+                        width: 12,
+                        height: 12,
+                        position: 'absolute',
+                        top: 5,
+                      }}></View>
+                    <View
+                      style={{
+                        backgroundColor: 'green',
+                        width: 12,
+                        height: 12,
+                        position: 'absolute',
+                        top: 5,
+                        transform: 'rotate(30deg)',
+                      }}></View>
+                    <View
+                      style={{
+                        backgroundColor: 'green',
+                        width: 12,
+                        height: 12,
+                        position: 'absolute',
+                        top: 5,
+                        transform: 'rotate(60deg)',
+                      }}></View>
+                    <Text
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        padding: 1,
+                        transform: 'scale(0.8)',
+                      }}>
+                      ✓
+                    </Text>
+                    <Text
+                      style={{
+                        marginStart: 20,
+                      }}>
+                      {userData?.providerId[0].replace('.com', '')}
+                    </Text>
+                  </View>
+                  <Text> ,</Text>
+                  <View
+                    style={{
+                      marginStart: 10,
+                      position: 'relative',
+                    }}>
+                    <View
+                      style={{
+                        backgroundColor: 'green',
+                        width: 12,
+                        height: 12,
+                        position: 'absolute',
+                        top: 5,
+                      }}></View>
+                    <View
+                      style={{
+                        backgroundColor: 'green',
+                        width: 12,
+                        height: 12,
+                        position: 'absolute',
+                        top: 5,
+                        transform: 'rotate(30deg)',
+                      }}></View>
+                    <View
+                      style={{
+                        backgroundColor: 'green',
+                        width: 12,
+                        height: 12,
+                        position: 'absolute',
+                        top: 5,
+                        transform: 'rotate(60deg)',
+                      }}></View>
+                    <Text
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        padding: 1,
+                        transform: 'scale(0.8)',
+                      }}>
+                      ✓
+                    </Text>
+                    <Text
+                      style={{
+                        marginStart: 20,
+                      }}>
+                      {userData?.providerId[1].replace('.com', '')}
+                    </Text>
+                  </View>
+                </View>
+              )}
               {userData?.email && <Text>Email ID : {userData?.email}</Text>}
               {userData?.phoneNumber && (
                 <Text>Phone Number : {userData?.phoneNumber}</Text>
               )}
+              <View
+                style={{
+                  height: 25,
+                }}></View>
+              <Button title="Logout" onPress={handleSignOut} />
+              <ScrollView>
+                {/* <MarketValidationForm /> */}
+              </ScrollView>
             </>
           )}
-          <View
-            style={{
-              height: 25,
-            }}></View>
-          <Button title="Logout" onPress={handleSignOut} />
         </>
       ) : (
         <>
@@ -233,7 +337,7 @@ function Login(): JSX.Element {
               />
               <Button
                 title={'Login' + (loggedInUser ? '' : ' (' + countdown + 's)')}
-                disabled={!(otp.length === 6)}
+                disabled={!(otp.length === 6) || isWaitForConfirm}
                 onPress={confirmCode}
               />
             </>
